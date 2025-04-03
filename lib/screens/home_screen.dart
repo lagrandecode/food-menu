@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/time.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -44,11 +43,11 @@ class HomeScreen extends StatelessWidget {
                 itemCount: breakfastItems.length,
                 itemBuilder: (context, index) {
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color: Colors.grey[900],
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(9),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                           breakfastItems[index],
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 30,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -74,7 +73,7 @@ class HomeScreen extends StatelessWidget {
                             'Available',
                             style: TextStyle(
                               color: Colors.green,
-                              fontSize: 14,
+                              fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -105,5 +104,6 @@ final List<String> breakfastItems = [
   'Porridge',
   'Fritters',
   'Fried Dumpling',
+  'Callaloo and Saltfish'
 ];
 
