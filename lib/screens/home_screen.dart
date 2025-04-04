@@ -240,13 +240,13 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 40,
+              height: 55,
               color: Colors.grey[900],
               child: Marquee(
                 text: marqueeText,
                 style: GoogleFonts.spaceGrotesk(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
                 ),
                 scrollAxis: Axis.horizontal,
