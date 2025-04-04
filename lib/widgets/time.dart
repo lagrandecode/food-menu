@@ -35,14 +35,10 @@ class _TimeState extends State<Time> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "FOOD MENU",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 35,
-            fontWeight: FontWeight.bold
-          ),
-        ),
+        Container(
+          height: 80,
+            width: 80,
+            child: Image.asset("assets/images/logo.png")),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
