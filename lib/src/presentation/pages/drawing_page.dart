@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/marquee_provider.dart';
+import '../../../widgets/time.dart';
 
 import '../../domain/domain.dart';
 import '../../src.dart';
@@ -121,6 +122,12 @@ class _DrawingPageState extends State<DrawingPage>
             ),
             Positioned(
               top: 55,
+              left: 16,
+              right: 16,
+              child: const Time(),
+            ),
+            Positioned(
+              top: 55,
               child: SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(-1, 0),
@@ -182,10 +189,10 @@ class _CustomAppBar extends StatelessWidget {
               icon: const Icon(Icons.menu),
             ),
             const Text(
-              'CARIBBEAN QUEEN FOOD MENU',
+              'Let\'s Draw',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 30,
+                fontSize: 19,
               ),
             ),
             const SizedBox.shrink(),
