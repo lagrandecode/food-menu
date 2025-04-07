@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../widgets/time.dart';
 import 'dart:async';
 import 'package:marquee/marquee.dart';
+import '../providers/marquee_provider.dart';
 
 class BreakfastItem {
   final String name;
@@ -28,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   final TextEditingController _newItemController = TextEditingController();
   final TextEditingController _marqueeController = TextEditingController();
-  String marqueeText = "Caribbean Queen Jerk is the premier restaurant for delicious, authentic, and affordable Jamaican cuisine in the Greater Toronto Area. We are proud to serve you great food across five locations, including our special Caribbean buffet. Our leadership team has spent more than a decade working together to build a delicious menu and a positive customer experience. Our food is fresh and our smiles are free. Our doors open at 6:00 am to welcome hundreds of hungry clients for breakfast, and they don't close until everyone has enjoyed their tasty Caribbean lunches and dinners. We look forward to serving you soon.";
 
   @override
   void initState() {
@@ -165,7 +166,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showEditMarqueeDialog() {
-    _marqueeController.text = marqueeText;
+    final marqueeProvider = Provider.of<MarqueeProvider>(context, listen: false);
+    _marqueeController.text = marqueeProvider.marqueeText;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -198,9 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                marqueeText = _marqueeController.text;
-              });
+              marqueeProvider.updateMarqueeText(_marqueeController.text);
               Navigator.pop(context);
             },
             child: Text(
@@ -242,22 +242,24 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               height: 55,
               color: Colors.grey[900],
-              child: Marquee(
-                text: marqueeText,
-                style: GoogleFonts.spaceGrotesk(
-                  color: Colors.white,
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
+              child: Consumer<MarqueeProvider>(
+                builder: (context, marqueeProvider, child) => Marquee(
+                  text: marqueeProvider.marqueeText,
+                  style: GoogleFonts.spaceGrotesk(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  scrollAxis: Axis.horizontal,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  blankSpace: 20.0,
+                  velocity: 50.0,
+                  startPadding: 10.0,
+                  accelerationDuration: const Duration(seconds: 1),
+                  accelerationCurve: Curves.linear,
+                  decelerationDuration: const Duration(milliseconds: 500),
+                  decelerationCurve: Curves.easeOut,
                 ),
-                scrollAxis: Axis.horizontal,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                blankSpace: 20.0,
-                velocity: 50.0,
-                startPadding: 10.0,
-                accelerationDuration: const Duration(seconds: 1),
-                accelerationCurve: Curves.linear,
-                decelerationDuration: const Duration(milliseconds: 500),
-                decelerationCurve: Curves.easeOut,
               ),
             ),
             Padding(

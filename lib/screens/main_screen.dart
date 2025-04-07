@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_screen.dart';
-import 'drawing_screen.dart';
+import '../src/presentation/pages/drawing_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,14 +15,8 @@ class _MainScreenState extends State<MainScreen> {
   
   final List<Widget> _screens = [
     const HomeScreen(),
-    const DrawingScreen(),
+    const DrawingPage(),
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +36,11 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
           backgroundColor: Colors.black,
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.grey,
@@ -56,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
               label: 'Menu',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.brush),
+              icon: Icon(Icons.draw),
               label: 'Drawing',
             ),
           ],

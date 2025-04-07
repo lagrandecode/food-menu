@@ -1,9 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:food_menu/screens/main_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'screens/main_screen.dart';
+import 'providers/marquee_provider.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => MarqueeProvider(),
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,9 +20,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Food Menu',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.black,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        textTheme: GoogleFonts.spaceGroteskTextTheme(
+          Theme.of(context).textTheme,
+        ),
+        useMaterial3: true,
       ),
       home: const MainScreen(),
     );
