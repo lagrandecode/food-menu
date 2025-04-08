@@ -45,7 +45,7 @@ class _TimeState extends State<Time> {
             Text(
               _dateString,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -54,7 +54,7 @@ class _TimeState extends State<Time> {
             Text(
               _timeString,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 20,
               ),
             ),

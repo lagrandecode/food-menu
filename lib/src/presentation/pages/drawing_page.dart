@@ -127,7 +127,7 @@ class _DrawingPageState extends State<DrawingPage>
               child: const Time(),
             ),
             Positioned(
-              top: 55,
+              top: 155,
               child: SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(-1, 0),
@@ -189,10 +189,10 @@ class _CustomAppBar extends StatelessWidget {
               icon: const Icon(Icons.menu),
             ),
             const Text(
-              'Let\'s Draw',
+              'CARIBBEAN QUEEN FOOD MENU',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 19,
+                fontSize: 30,
               ),
             ),
             const SizedBox.shrink(),
