@@ -9,4 +9,6 @@ class MarqueeProvider extends ChangeNotifier {
     _marqueeText = newText;
     notifyListeners();
   }
-} 
+}
+
+///////
