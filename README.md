@@ -2,13 +2,15 @@
 
 A dynamic digital menu application for Caribbean Queen Restaurant, allowing cashiers to manage and display the daily food menu with both text and drawing capabilities.
 
-![App Screenshot](screenshot.png)
+
+![Menu Screen](assets/images/screenshot1.png)
+![Drawing Screen](assets/images/screenshot2.png)
 
 ## Overview
 
 Caribbean Queen Restaurant's Food Menu App is designed to streamline the process of displaying and managing the restaurant's menu. The app features a dynamic marquee text display, automatic availability updates based on time, and a drawing board for creating visual menu items or special announcements.
 
-## Features
+## Features////
 
 ### Menu Management
 - **Dynamic Menu Items**: Add, remove, and toggle availability of menu items
