@@ -2,7 +2,7 @@
 
 A dynamic digital menu application for Caribbean Queen Restaurant, allowing cashiers to manage and display the daily food menu with both text and drawing capabilities.
 
-![App Screenshot](screenshot.png)
+![App Screenshot](assets/images/img.png)
 
 ## Overview
 
