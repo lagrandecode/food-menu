@@ -50,6 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
       BreakfastItem(name: 'Callaloo and Saltfish'),
     ];
     _startTimeCheck();
+    updateMenu();
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      updateMenu();
+    });
   }
 
   @override
@@ -213,10 +217,24 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  String menuText = '';
+
+  void updateMenu() {
+    final now = DateTime.now();
+    final currentHour = now.hour;
+    setState(() {
+      if(currentHour >= 5 && currentHour < 11) {
+        menuText = 'Breakfast Menu';
+      } else {
+        menuText = 'Lunch Menu';
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -270,9 +288,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Time(),
                   const SizedBox(height: 24),
                   Text(
-                    'Breakfast Menu',
+                    menuText,
                     style: GoogleFonts.spaceGrotesk(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
@@ -281,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     'Available Items',
                     style: GoogleFonts.spaceGrotesk(
-                      color: Colors.grey[400],
+                      color: Colors.grey[700],
                       fontSize: 18,
                     ),
                   ),
@@ -289,9 +307,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
+              child: ReorderableListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: breakfastItems.length,
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
+                    final item = breakfastItems.removeAt(oldIndex);
+                    breakfastItems.insert(newIndex, item);
+                  });
+                },
                 itemBuilder: (context, index) {
                   final item = breakfastItems[index];
                   return Dismissible(
@@ -321,18 +348,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: GoogleFonts.spaceGrotesk(),
                           ),
                           backgroundColor: Colors.red,
-                          duration: const Duration(seconds: 2),
+                          duration: const Duration(seconds: 1),
                         ),
                       );
                     },
                     child: GestureDetector(
                       onTap: () => _toggleAvailability(index),
                       child: Container(
+                        key: ValueKey(item.name),
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: Colors.grey[900],
+                          color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(9),
+                          border: Border.all(color: Colors.grey[300]!),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -340,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               item.name,
                               style: GoogleFonts.spaceGrotesk(
-                                color: item.isAvailable ? Colors.white : Colors.grey[400],
+                                color: item.isAvailable ? Colors.black : Colors.grey[400],
                                 fontSize: 30,
                                 fontWeight: FontWeight.w500,
                                 decoration: item.isAvailable ? null : TextDecoration.lineThrough,
@@ -348,23 +377,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                 decorationThickness: 2,
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[800],
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                item.isAvailable ? 'Available' : 'Not Available',
-                                style: GoogleFonts.spaceGrotesk(
-                                  color: item.isAvailable ? Colors.green : Colors.red,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    item.isAvailable ? 'Available' : 'Not Available',
+                                    style: GoogleFonts.spaceGrotesk(
+                                      color: item.isAvailable ? Colors.green : Colors.red,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.drag_handle, color: Colors.transparent),
+                              ],
                             ),
                           ],
                         ),
