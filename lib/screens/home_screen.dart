@@ -7,6 +7,7 @@ import '../providers/marquee_provider.dart';
 import '../providers/food_items_provider.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'dart:async';
+import '../providers/weather_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,7 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final foodItemsProvider = Provider.of<FoodItemsProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final isMobile = screenWidth < 600;
+    final isCompactMobile = screenWidth <= 599;
+    final showSidebar = screenWidth >= 890 && screenHeight >= 728;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -80,14 +84,14 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Container(
-              height: 55,
+              height: isCompactMobile ? 40 : 55,
               color: Colors.grey[900],
               child: Consumer<MarqueeProvider>(
                 builder: (context, marqueeProvider, child) => Marquee(
                   text: marqueeProvider.marqueeText,
                   style: GoogleFonts.spaceGrotesk(
                     color: Colors.white,
-                    fontSize: isMobile ? 24 : 40,
+                    fontSize: isCompactMobile ? 18 : (isMobile ? 24 : 40),
                     fontWeight: FontWeight.bold,
                   ),
                   scrollAxis: Axis.horizontal,
@@ -114,101 +118,176 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMobileLayout(FoodItemsProvider foodItemsProvider) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildWeatherWidget(),
-          _buildAdvertisementsWidget(),
-          _buildEventsWidget(),
-          _buildMenuContent(foodItemsProvider),
-        ],
-      ),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isCompactMobile = screenWidth <= 599;
+
+    return Column(
+      children: [
+        Expanded(
+          child: _buildMenuContent(foodItemsProvider, isCompactMobile),
+        ),
+      ],
     );
   }
 
   Widget _buildDesktopLayout(FoodItemsProvider foodItemsProvider, double screenWidth) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final showSidebar = screenWidth >= 890 && screenHeight >= 728;
+    final isCompactMobile = screenWidth <= 599;
+
     return Row(
       children: [
-        // Left Sidebar (1/3 width)
-        Container(
-          width: screenWidth / 3,
-          color: Colors.grey[100],
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildWeatherWidget(),
-                _buildAdvertisementsWidget(),
-                _buildEventsWidget(),
-              ],
+        if (showSidebar)
+          Container(
+            width: screenWidth / 3,
+            color: Colors.grey[100],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildWeatherWidget(),
+                  _buildAdvertisementsWidget(),
+                  _buildEventsWidget(),
+                ],
+              ),
             ),
           ),
-        ),
-        // Main Content (2/3 width)
         Expanded(
-          child: _buildMenuContent(foodItemsProvider),
+          child: _buildMenuContent(foodItemsProvider, isCompactMobile),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeatherInfo(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, size: 24, color: Colors.blue),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+        Text(
+          value,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
   }
 
   Widget _buildWeatherWidget() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Weather',
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+    return Consumer<WeatherProvider>(
+      builder: (context, weatherProvider, child) {
+        if (weatherProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (weatherProvider.error != null) {
+          return Center(
+            child: Text(
+              'Error loading weather: ${weatherProvider.error}',
+              style: GoogleFonts.spaceGrotesk(color: Colors.red),
             ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.wb_sunny, size: 40, color: Colors.orange),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '25°C',
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+          );
+        }
+
+        final weatherData = weatherProvider.weatherData;
+        if (weatherData == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Weather',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Text(
-                      'Sunny',
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                  ),
+                  Icon(
+                    weatherData.isDaytime ? Icons.wb_sunny : Icons.nightlight_round,
+                    color: weatherData.isDaytime ? Colors.orange : Colors.blueGrey,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-              ],
-            ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          _getWeatherIcon(weatherData.condition),
+                          size: 50,
+                          color: _getWeatherIconColor(weatherData.condition),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${weatherData.temperature.toStringAsFixed(1)}°C',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              weatherData.description,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildWeatherInfo('Humidity', '${weatherData.humidity}%', Icons.water_drop),
+                        _buildWeatherInfo('Wind', '${weatherData.windSpeed} km/h', Icons.air),
+                        _buildWeatherInfo('Clouds', '${weatherData.cloudCover}%', Icons.cloud),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+
   Widget _buildAdvertisementsWidget() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -412,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMenuContent(FoodItemsProvider foodItemsProvider) {
+  Widget _buildMenuContent(FoodItemsProvider foodItemsProvider, bool isCompactMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -421,13 +500,15 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Time(),
-              const SizedBox(height: 24),
+              if (!isCompactMobile) ...[
+                const Time(),
+                const SizedBox(height: 24),
+              ],
               Text(
                 menuText,
                 style: GoogleFonts.spaceGrotesk(
                   color: Colors.black,
-                  fontSize: 32,
+                  fontSize: isCompactMobile ? 24 : 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -436,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Available Items',
                 style: GoogleFonts.spaceGrotesk(
                   color: Colors.grey[700],
-                  fontSize: 18,
+                  fontSize: isCompactMobile ? 14 : 18,
                 ),
               ),
             ],
@@ -499,7 +580,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   item.name,
                                   style: GoogleFonts.spaceGrotesk(
                                     color: item.isAvailable ? Colors.black : Colors.grey[300],
-                                    fontSize: 30,
+                                    fontSize: isCompactMobile ? 20 : 30,
                                     fontWeight: FontWeight.w500,
                                     decoration: item.isAvailable ? null : TextDecoration.lineThrough,
                                     decorationColor: Colors.red,
@@ -511,9 +592,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isCompactMobile ? 8 : 12,
+                                      vertical: isCompactMobile ? 4 : 6,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.grey[200],
@@ -523,7 +604,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       item.isAvailable ? 'Available' : 'Not Available',
                                       style: GoogleFonts.spaceGrotesk(
                                         color: item.isAvailable ? Colors.green : Colors.red,
-                                        fontSize: 20,
+                                        fontSize: isCompactMobile ? 14 : 20,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -649,6 +730,76 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  IconData _getWeatherIcon(String condition) {
+    switch (condition.toUpperCase()) {
+      case 'CLEAR':
+        return Icons.wb_sunny;
+      case 'PARTLY_CLOUDY':
+        return Icons.cloud;
+      case 'CLOUDY':
+        return Icons.cloud_queue;
+      case 'RAIN':
+        return Icons.beach_access;
+      case 'SNOW':
+        return Icons.ac_unit;
+      case 'THUNDERSTORM':
+        return Icons.flash_on;
+      case 'FOG':
+        return Icons.cloud;
+      case 'WINDY':
+        return Icons.air;
+      case 'HAIL':
+        return Icons.grain;
+      case 'SLEET':
+        return Icons.grain;
+      case 'DUST':
+        return Icons.blur_on;
+      case 'SMOKE':
+        return Icons.cloud;
+      case 'HAZE':
+        return Icons.blur_on;
+      case 'MIST':
+        return Icons.cloud;
+      default:
+        return Icons.wb_sunny;
+    }
+  }
+
+  Color _getWeatherIconColor(String condition) {
+    switch (condition.toUpperCase()) {
+      case 'CLEAR':
+        return Colors.orange;
+      case 'PARTLY_CLOUDY':
+        return Colors.blueGrey;
+      case 'CLOUDY':
+        return Colors.grey;
+      case 'RAIN':
+        return Colors.blue;
+      case 'SNOW':
+        return Colors.lightBlue;
+      case 'THUNDERSTORM':
+        return Colors.deepPurple;
+      case 'FOG':
+        return Colors.grey;
+      case 'WINDY':
+        return Colors.blueGrey;
+      case 'HAIL':
+        return Colors.blueGrey;
+      case 'SLEET':
+        return Colors.blueGrey;
+      case 'DUST':
+        return Colors.brown;
+      case 'SMOKE':
+        return Colors.grey;
+      case 'HAZE':
+        return Colors.grey;
+      case 'MIST':
+        return Colors.grey;
+      default:
+        return Colors.orange;
+    }
   }
 }
 
